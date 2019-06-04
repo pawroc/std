@@ -101,9 +101,10 @@ public:
         }
         else
         {
-            tail->nextNode = new Node;
-            tail = tail->nextNode;
-            tail->data = val;
+            auto newTail = new Node;
+            newTail->data = val;
+            tail->nextNode = newTail;
+            tail = newTail;
         }
     }
 

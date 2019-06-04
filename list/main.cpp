@@ -3,6 +3,26 @@
 
 #include "list.hpp"
 #include <cassert>
+#include <iostream>
+
+template<class Iterator>
+void double_each_element(Iterator begin, Iterator end) 
+{
+    for (auto it = begin; it != end; ++it) {
+        *it *= 2;
+    } 
+}
+
+template <class Iterator>
+void print(Iterator begin, Iterator end)
+{
+    std::cout << '[';
+    for (auto it = begin; begin != end; ++it)
+    {
+        std::cout << *it << ", ";
+    }
+    std::cout << "]\n";
+}
 
 void testClear()
 {
@@ -66,10 +86,19 @@ void testIncrementations()
     list.emplace_back(1);
     list.emplace_back(2);
     list.emplace_back(3);
+    print(list.cbegin(), list.cend());
 
-    auto it = list.begin();
-    assert(*(++it) == 2);
-    assert(*(it++) == 2);
+    // auto it = list.begin();
+    // assert(*(++it) == 2);
+    // assert(*(it++) == 2);
+
+    // double_each_element(list.begin(), list.end());
+
+    // print(list.begin(), list.end());
+
+    // assert(*list.begin() == 2);
+    // assert(list.begin() + 1 == 4);
+    // assert(*list.end() == 6);
 }
 
 int main()
