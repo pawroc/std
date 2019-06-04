@@ -30,8 +30,7 @@ void testIterators()
     *(list.begin()) = 10;
     assert(*(list.begin()) == 10);
 
-    // list.cbegin()->data = 100;
-    // assert(list.cbegin()->data == 100);
+    assert(list.begin() == list.cbegin());
 }
 
 void testDeleteNode()

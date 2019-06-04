@@ -1,41 +1,48 @@
 #pragma once
 
+#include <type_traits>
+
 namespace my::std
 {
-template <class T>
+template <class T, bool Const>
 class iterator
 {
-public:
-    using reference = typename T::value_type&;
-    using node_pointer = T*;
+private:
+    using reference = ::std::conditional_t<Const, const typename T::value_type&, typename T::value_type&>;
+    using node_pointer = ::std::conditional_t<Const, const T*, T*>;
 
-    explicit iterator(T* ptr) : nodePtr{ptr}
+    friend class iterator<T, !Const>;
+
+public:
+    explicit iterator(T* ptr) : node{ptr}
     {
     }
 
     reference operator* ()
     {
-        return nodePtr->data;
+        return node->data;
     }
 
     reference operator-> ()
     {
-        return nodePtr->data;
+        return node->data;
     }
 
-    bool operator== (const iterator<T>& it) const
+    template <bool U>
+    bool operator== (const iterator<T, U>& it) const
     {
-        return nodePtr == it.nodePtr;
+        return node == it.node;
     }
 
-    bool operator!= (const iterator<T>& it) const
+    template <bool U>
+    bool operator!= (const iterator<T, U>& it) const
     {
-        return nodePtr != it.nodePtr;
+        return node != it.node;
     }
 
     auto& operator++ ()
     {
-        nodePtr = nodePtr->nextNode;
+        node = node->nextNode;
         return *this;
     }
 
@@ -46,14 +53,13 @@ public:
         return result;
     }
 
-private:
-    node_pointer nodePtr;
-};
+    operator iterator<T, true>() const
+    {
+        return iterator<T, true>{node};
+    }
 
-template <class T>
-class const_iterator
-{
-p
+private:
+    node_pointer node;
 };
 
 template <class T>
@@ -67,6 +73,9 @@ private:
         T data{};
         Node* nextNode{nullptr};
     };
+
+    using iterator = my::std::iterator<Node, false>;
+    using const_iterator = my::std::iterator<Node, true>;
 
 public:
     using value_type = T;
@@ -98,25 +107,25 @@ public:
         }
     }
 
-    iterator<Node> begin()
+    iterator begin() const
     {
         return iterator{head};
     }
 
-    iterator<Node> end()
+    iterator end() const
     {
         return iterator{tail};
     }
 
-    // const T* const cbegin() const
-    // {
-    //     return head->data;
-    // }
+    const_iterator cbegin() const
+    {
+        return const_iterator{head};
+    }
 
-    // const T* const cend() const
-    // {
-    //     return tail->data;
-    // }
+    const_iterator cend() const
+    {
+        return const_iterator{tail};
+    }
 
     void deleteNode()
     {
