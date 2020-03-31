@@ -14,20 +14,20 @@ public:
     {
         if (not pointee)
         {
-            ::std::cout << "+++ creating new shared_ptr\n";
+            // ::std::cout << "+++ creating new shared_ptr\n";
             refCount = new unsigned int(1);
             pointee = ptr;
         }
         else
         {
-            ::std::cout << "+++ increasing refCount\n";
+            // ::std::cout << "+++ increasing refCount\n";
             ++(*refCount);
         }
     }
 
     shared_ptr(const shared_ptr<T>& other)
     {
-        ::std::cout << "+++ copying from other shared_ptr -> increasing refCount\n";
+        // ::std::cout << "+++ copying from other shared_ptr -> increasing refCount\n";
         pointee = other.pointee;
         refCount = other.refCount;
 
@@ -36,21 +36,15 @@ public:
 
     shared_ptr(shared_ptr<T>&& other)
     {
-        ::std::cout << "=== moving from other shared_ptr\n";
-        pointee = new T;
-        refCount = new unsigned int;
-        *pointee = ::std::move(*other.pointee);
-        *refCount = ::std::move(*other.refCount);
-
-        other.pointee = nullptr;
-        other.refCount = nullptr;
+        // ::std::cout << "=== moving from other shared_ptr\n";
+        move(::std::move(other));
     }
 
     shared_ptr<T>& operator=(const shared_ptr<T>& other)
     {
         if (&other == this) return *this;
 
-        ::std::cout << "=== copy assigning from other shared_ptr\n";
+        // ::std::cout << "=== copy assigning from other shared_ptr\n";
         pointee = other.pointee;
         refCount = other.refCount;
         ++(*refCount);
@@ -62,24 +56,20 @@ public:
     {
         if (&other == this) return *this;
 
-        ::std::cout << "=== move assigning from other shared_ptr\n";
-        if (not pointee)
+        // ::std::cout << "=== move assigning from other shared_ptr\n";
+        if (pointee)
         {
-            ::std::cout << "--- decrementing current refCount\n";
-            decrement();        
+            // ::std::cout << "--- decrementing current refCount\n";
+            decrement();
         }
-        pointee = other.pointee;
-        refCount = other.refCount;
-
-        other.pointee = nullptr;
-        other.refCount = nullptr;
+        move(::std::move(other));
 
         return *this;
     }
 
     ~shared_ptr()
     {
-        ::std::cout << "<< deleting shared_ptr\n";
+        // ::std::cout << "<< deleting shared_ptr\n";
         decrement();
     }
 
@@ -96,7 +86,7 @@ private:
         {
             if (*refCount == 1)
             {
-                ::std::cout << "--- deleting pointee\n";
+                // ::std::cout << "--- deleting pointee\n";
                 delete pointee;
                 delete refCount;
 
@@ -108,6 +98,15 @@ private:
                 --(*refCount);
             }
         }
+    }
+
+    void move(shared_ptr<T>&& other)
+    {
+        pointee = other.pointee;
+        refCount = other.refCount;
+
+        other.pointee = nullptr;
+        other.refCount = nullptr;
     }
 
 private:
